@@ -1,11 +1,13 @@
-#version 460
+#version 460 core
+#pragma shader_stage(vertex)
+
+vec4 pos[3] = {
+	vec4(-0.5, -0.5, 0., 1.),
+	vec4(0., 0.5, 0., 1),
+	vec4(0.5, -0.5, 0., 1.),
+};
 
 void main() {
-	if (gl_VertexIndex == 0) {
-		gl_Position = vec4(-0.5, -0.5, 0, 1);
-	} else if (gl_VertexIndex == 1) {
-		gl_Position = vec4(0, 0.5, 0, 1);
-	} else if (gl_VertexIndex == 2) {
-		gl_Position = vec4(0.5, -0.5, 0, 1);
-	}
+	gl_Position = pos[gl_VertexIndex];
+	// gl_Position.y += sin(millis/1000. + gl_Position.x * 8.) / 8.;
 }

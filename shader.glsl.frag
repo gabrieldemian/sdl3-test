@@ -1,8 +1,13 @@
 #version 460 core
 #pragma shader_stage(fragment)
 
-layout (location = 0) out vec4 color;
+layout (location = 0) out vec3 color;
 
 void main() {
-	color = vec4(1, 0, 0, 1);
+	color =
+		vec3(
+			gl_FragCoord.x / 640,
+			gl_FragCoord.y / 480,
+			gl_FragCoord.z / 640
+		);
 }

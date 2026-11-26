@@ -38,8 +38,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 		fprintf(stderr, "ERROR: Could not claim window for device\n");
 	};
 
-	size_t shader_vert_code_size = 0;
-	size_t shader_frag_code_size = 0;
+	size_t shader_vert_code_size;
+	size_t shader_frag_code_size;
 
 	shader_vert_code = SDL_LoadFile("shader.spv.vert", &shader_vert_code_size);
 	shader_frag_code = SDL_LoadFile("shader.spv.frag", &shader_frag_code_size);
@@ -88,25 +88,26 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 				SDL_GetError());
 	};
 
-	SDL_GPUTexture *swapchaintext;
-	if (!SDL_WaitAndAcquireGPUSwapchainTexture(cmd_buf, window, &swapchaintext,
-											   NULL, NULL)) {
-		SDL_Log("WaitAndAcquireGPUSwapchainTexture failed: %s", SDL_GetError());
-		return -1;
-	}
+	SDL_GPUTexture *swapchaintex;
 
-	if (!swapchaintext) {
+	if (!SDL_WaitAndAcquireGPUSwapchainTexture(cmd_buf, window, &swapchaintex,
+											   NULL, NULL)) {
+		SDL_Log("WaitAndAcquire... failed: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
 
-	SDL_GPUColorTargetInfo colorTargetInfo = {0};
-	colorTargetInfo.texture				   = swapchaintext;
-	colorTargetInfo.load_op				   = SDL_GPU_LOADOP_CLEAR;
-	colorTargetInfo.store_op			   = SDL_GPU_STOREOP_STORE;
-	colorTargetInfo.clear_color = (SDL_FColor){0.0f, 0.0f, 0.0f, 1.0f};
+	if (!swapchaintex) {
+		return SDL_APP_FAILURE;
+	}
+
+	SDL_GPUColorTargetInfo color_target_info = {0};
+	color_target_info.texture				 = swapchaintex;
+	color_target_info.load_op				 = SDL_GPU_LOADOP_CLEAR;
+	color_target_info.store_op				 = SDL_GPU_STOREOP_STORE;
+	color_target_info.clear_color = (SDL_FColor){0.0f, 0.0f, 0.0f, 1.0f};
 
 	SDL_GPURenderPass *rp =
-		SDL_BeginGPURenderPass(cmd_buf, &colorTargetInfo, 1, NULL);
+		SDL_BeginGPURenderPass(cmd_buf, &color_target_info, 1, NULL);
 
 	SDL_BindGPUGraphicsPipeline(rp, pipeline);
 
